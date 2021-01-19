@@ -1,5 +1,5 @@
 {
-  "name": "@dragosm/chip-input",
+  "name": "chip-input",
   "version": "1.1.0",
   "description": "",
   "main": "lib/ChipInput.js",
