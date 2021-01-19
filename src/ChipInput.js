@@ -185,7 +185,7 @@ class ChipInput extends React.Component {
     prevPropsValue: []
   }
 
-  constructor (props) {
+  constructor(props) {
     super(props)
     if (props.defaultValue) {
       this.state.chips = props.defaultValue
@@ -194,18 +194,18 @@ class ChipInput extends React.Component {
     this.input = React.createRef()
   }
 
-  componentDidMount () {
+  componentDidMount() {
     if (this.props.variant === 'outlined') {
       this.labelNode = ReactDOM.findDOMNode(this.labelRef.current)
       this.forceUpdate()
     }
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     clearTimeout(this.inputBlurTimeout)
   }
 
-  static getDerivedStateFromProps (props, state) {
+  static getDerivedStateFromProps(props, state) {
     let newState = null
 
     if (props.value && props.value.length !== state.prevPropsValue.length) {
@@ -235,7 +235,7 @@ class ChipInput extends React.Component {
    * Blurs this component.
    * @public
    */
-  blur () {
+  blur() {
     if (this.input) this.actualInput.blur()
   }
 
@@ -383,7 +383,7 @@ class ChipInput extends React.Component {
    * @param {string|object} chip Value of the chip, either a string or an object (if dataSourceConfig is set)
    * @returns True if the chip was added (or at least `onAdd` was called), false if adding the chip was prevented
    */
-  handleAddChip (chip) {
+  handleAddChip(chip) {
     if (this.props.onBeforeAdd && !this.props.onBeforeAdd(chip)) {
       this._preventChipCreation = true
       return false
@@ -422,7 +422,7 @@ class ChipInput extends React.Component {
     return false
   }
 
-  handleDeleteChip (chip, i) {
+  handleDeleteChip(chip, i) {
     if (!this.props.value) {
       const chips = this.state.chips.slice()
       const changed = chips.splice(i, 1) // remove the chip at index i
@@ -440,7 +440,7 @@ class ChipInput extends React.Component {
     }
   }
 
-  updateChips (chips, additionalUpdates = {}) {
+  updateChips(chips, additionalUpdates = {}) {
     this.setState({ chips, chipsUpdated: true, ...additionalUpdates })
     if (this.props.onChange) {
       this.props.onChange(chips)
@@ -452,11 +452,11 @@ class ChipInput extends React.Component {
    * This only works in uncontrolled input mode, i.e. if the inputValue prop is not used.
    * @public
    */
-  clearInput () {
+  clearInput() {
     this.updateInput('')
   }
 
-  updateInput (value) {
+  updateInput(value) {
     this.setState({ inputValue: value })
   }
 
@@ -471,12 +471,13 @@ class ChipInput extends React.Component {
     }
   }
 
-  render () {
+  render() {
     const {
       allowDuplicates,
       alwaysShowPlaceholder,
       blurBehavior,
       children,
+      chipProps = { classes: {} },
       chipRenderer = defaultChipRenderer,
       classes,
       className,
@@ -494,7 +495,7 @@ class ChipInput extends React.Component {
       fullWidthInput,
       helperText,
       id,
-      InputProps = {classes:{}},
+      InputProps = { classes: {} },
       inputRef,
       InputLabelProps = {},
       inputValue,
@@ -538,7 +539,7 @@ class ChipInput extends React.Component {
           isFocused: this.state.focusedChip === i,
           handleClick: () => this.setState({ focusedChip: i }),
           handleDelete: () => this.handleDeleteChip(chip, i),
-          className: classes.chip
+          className: cx(classes.chip, chipProps.classes.chip)
         },
         i
       )
@@ -562,7 +563,7 @@ class ChipInput extends React.Component {
 
     const InputComponent = variantComponent[variant]
 
-    const underlineStyle = cx(classes.underline,InputProps.classes.underline)
+    const underlineStyle = cx(classes.underline, InputProps.classes.underline)
 
     return (
       <FormControl
