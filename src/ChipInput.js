@@ -477,7 +477,7 @@ class ChipInput extends React.Component {
       alwaysShowPlaceholder,
       blurBehavior,
       children,
-      chipProps = { classes: {} },
+      chipProps = { classes: { inputContainer: {}, input: {} } },
       chipRenderer = defaultChipRenderer,
       classes,
       className,
@@ -565,13 +565,24 @@ class ChipInput extends React.Component {
 
     const underlineStyle = cx(classes.underline, InputProps.classes.underline)
 
+    const inputContainerClassName = cx(
+      classes[variant],
+      classes.chipContainer,
+      {
+        [chipProps.classes.inputContainer?.focused ?? classes.focused]: this.state.isFocused,
+        [chipProps.classes.inputContainer?.underlineStyle ?? underlineStyle]: !disableUnderline && variant === 'standard',
+        [chipProps.classes.inputContainer?.disabled ?? classes.disabled]: disabled,
+        [chipProps.classes.inputContainer?.labeled ?? classes.labeled]: label != null,
+        [chipProps.classes.inputContainer?.error ?? classes.error]: error
+      }, chipProps.classes.inputContainer?.root)
+
     return (
       <FormControl
         ref={rootRef}
         fullWidth={fullWidth}
         className={cx(className, classes.root, {
           [classes.marginDense]: other.margin === 'dense'
-        })}
+        }, chipProps.classes.root)}
         error={error}
         required={required}
         onClick={this.focus}
@@ -582,7 +593,7 @@ class ChipInput extends React.Component {
         {label && (
           <InputLabel
             htmlFor={id}
-            classes={{ root: cx(classes[variant], classes.label), shrink: classes.labelShrink }}
+            classes={{ root: cx(classes[variant], classes.label, chipProps.classes.inputLabel), shrink: classes.labelShrink }}
             shrink={shrinkFloatingLabel}
             focused={this.state.isFocused}
             variant={variant}
@@ -593,23 +604,14 @@ class ChipInput extends React.Component {
           </InputLabel>
         )}
         <div
-          className={cx(
-            classes[variant],
-            classes.chipContainer,
-            {
-              [classes.focused]: this.state.isFocused,
-              [underlineStyle]: !disableUnderline && variant === 'standard',
-              [classes.disabled]: disabled,
-              [classes.labeled]: label != null,
-              [classes.error]: error
-            })}
+          className={inputContainerClassName}
         >
           {variant === 'standard' && chipComponents}
           <InputComponent
             ref={this.input}
             classes={{
-              input: cx(classes.input, classes[variant]),
-              root: cx(classes.inputRoot, classes[variant])
+              input: cx(classes.input, classes[variant], chipProps.classes.input?.input ?? ''),
+              root: cx(classes.inputRoot, classes[variant], chipProps.classes.input?.root ?? '')
             }}
             id={id}
             value={actualInputValue}
@@ -630,7 +632,7 @@ class ChipInput extends React.Component {
         {helperText && (
           <FormHelperText
             {...FormHelperTextProps}
-            className={FormHelperTextProps ? cx(FormHelperTextProps.className, classes.helperText) : classes.helperText}
+            className={FormHelperTextProps ? cx(FormHelperTextProps.className, classes.helperText, chipProps.classes.helperText) : chipProps.classes.helperText ?? classes.helperText}
           >
             {helperText}
           </FormHelperText>
@@ -647,6 +649,26 @@ ChipInput.propTypes = {
   alwaysShowPlaceholder: PropTypes.bool,
   /** Behavior when the chip input is blurred: `'clear'` clears the input, `'add'` creates a chip and `'ignore'` keeps the input. */
   blurBehavior: PropTypes.oneOf(['clear', 'add', 'ignore']),
+  /** chip props */
+  chipProps: {
+    classes: {
+      root: PropTypes.string, //override FormControl className,
+      inputLabel: PropTypes.string, //override InputLabel className,
+      inputContainer: {
+        root: PropTypes.string, // override Input container root className,
+        focused: PropTypes.string,
+        underlineStyle: PropTypes.string,
+        disabled: PropTypes.string,
+        labeled: PropTypes.string,
+        error: PropTypes.string
+      },
+      input: {
+        root: PropTypes.string,
+        input: PropTypes.string
+      },
+      helperText: PropTypes.string
+    }
+  },
   /** A function of the type `({ value, text, chip, isFocused, isDisabled, handleClick, handleDelete, className }, key) => node` that returns a chip based on the given properties. This can be used to customize chip styles.  Each item in the `dataSource` array will be passed to `chipRenderer` as arguments `chip`, `value` and `text`. If `dataSource` is an array of objects and `dataSourceConfig` is present, then `value` and `text` will instead correspond to the object values defined in `dataSourceConfig`. If `dataSourceConfig` is not set and `dataSource` is an array of objects, then a custom `chipRenderer` must be set. `chip` is always the raw value from `dataSource`, either an object or a string. */
   chipRenderer: PropTypes.func,
   /** Whether the input value should be cleared if the `value` prop is changed. */
